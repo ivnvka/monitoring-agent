@@ -17,15 +17,16 @@ import (
 type Heartbeat struct {
 	AgentID        string  `json:"agentId"`
 	Hostname       string  `json:"hostname"`
-	Version        string  `json:"version"`
-	Load1          float64 `json:"load1"`
-	MemTotalBytes  int64   `json:"memTotalBytes"`
-	MemUsedBytes   int64   `json:"memUsedBytes"`
-	MemUsedPct     float64 `json:"memUsedPct"`
-	DiskTotalBytes int64   `json:"diskTotalBytes"`
-	DiskUsedBytes  int64   `json:"diskUsedBytes"`
-	DiskUsedPct    float64 `json:"diskUsedPct"`
-	DockerRunning  int     `json:"dockerRunning"`
+	Version         string  `json:"version"`
+	Load1           float64 `json:"load1"`
+	MemTotalBytes   int64   `json:"memTotalBytes"`
+	MemUsedBytes    int64   `json:"memUsedBytes"`
+	MemUsedPct      float64 `json:"memUsedPct"`
+	DiskTotalBytes  int64   `json:"diskTotalBytes"`
+	DiskUsedBytes   int64   `json:"diskUsedBytes"`
+	DiskUsedPct     float64 `json:"diskUsedPct"`
+	DockerRunning   int     `json:"dockerRunning"`
+	DockerUnhealthy int     `json:"dockerUnhealthy"`
 }
 
 type Resp struct {
@@ -134,6 +135,7 @@ func main() {
 		load1 := readLoad1()
 		memTotal, memUsed, memUsedPct := readMem()
 		diskTotal, diskUsed, diskUsedPct := statDisk(hostRoot)
+		dockerRunning, dockerUnhealthy := readDockerStats()
 
 		payload := Heartbeat{
 			AgentID:        agentID,
@@ -146,7 +148,8 @@ func main() {
 			DiskTotalBytes: diskTotal,
 			DiskUsedBytes:  diskUsed,
 			DiskUsedPct:    diskUsedPct,
-			DockerRunning:  0,
+			DockerRunning:  dockerRunning,
+			DockerUnhealthy: dockerUnhealthy,
 		}
 		b, _ := json.Marshal(payload)
 
